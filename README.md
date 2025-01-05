@@ -1,70 +1,108 @@
-# Getting Started with Create React App
+# PDF Annotator with highlighting function
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Description
+A modern, interactive PDF annotation tool built with React that allows users to highlight, comment, and manage annotations within PDF documents. The application provides a smooth, intuitive interface for document review and collaboration.
 
-## Available Scripts
 
-In the project directory, you can run:
+### PDF Management
+- Upload and view PDF documents
+- Smooth zooming and navigation
+- Persistent document state
+- Multi-page support
 
-### `npm start`
+### Annotation Tools
+- **Text Highlighting**
+  - Multiple highlight colors (Yellow, Green, Pink, Purple, Orange)
+  - Toggle highlighting mode
+  - Add comments to highlighted sections
+  - Real-time annotation saving
+  - Easy deletion and modification
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### User Interface
+- Responsive design with mobile support
+- Collapsible sidebar for annotations
+- Clean, modern interface
+- Smooth animations and transitions
+- Dark mode support
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Requirements
+- Node.js (v16.0.0 or higher recommended)
+- npm, yarn, or pnpm package manager
+- Modern web browser with PDF.js support
 
-### `npm test`
+## Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone the repository:
+```bash
+git clone https://github.com/Abdulrazaq-pro/reactpdf.git
+cd reactpdf
+```
 
-### `npm run build`
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. Start the development server:
+```bash
+npm start
+# or
+yarn start
+# or
+pnpm start
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Open your browser and navigate to `http://localhost3000` (or the port shown in your terminal)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Usage Guide
 
-### `npm run eject`
+### Getting Started
+1. Launch the application
+2. Click the "Upload PDF" button to select a PDF file
+3. Wait for the document to load
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Using the Highlight Tool
+1. Click the highlight icon in the toolbar to activate highlighting mode
+2. Select your preferred highlight color from the color palette
+3. Click and drag across text to create highlights
+4. Add optional comments to your highlights in the sidebar
+5. Click the highlight icon again to exit highlighting mode
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Managing Annotations
+- View all highlights in the sidebar
+- Click on a highlight in the sidebar to locate it in the document
+- Add or edit comments for any highlight
+- Delete highlights using the trash icon
+- All annotations are automatically saved to local storage
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Technical Stack
+- React
+- react-pdf
+- GSAP for animations
+- Tailwind CSS for styling
+- Local Storage for persistence
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Browser Support
+- Chrome (recommended)
+- Firefox
+- Safari
+- Edge
 
-## Learn More
+## Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Acknowledgments
+- PDF.js for PDF rendering
+- react-pdf for React integration
+- Lucide for icons
+- GSAP for animations
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Support
+If you encounter any issues or have questions, please open an issue on GitHub.

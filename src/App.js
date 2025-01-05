@@ -9,26 +9,30 @@ import {
   ZoomOut,
   X,
   Menu,
-  MessageSquare,
   PaintBucket,
   Trash2,
-  Edit2,
-  AlertTriangle
+  AlertTriangle,
+  MessageSquareText,
 } from "lucide-react";
 
+// Had to set this up manually because the worker wasn't loading properly in dev
+// Might need to revisit this approach later, but it works for now
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url
 ).toString();
 
-export default function PdfAnnotator() {
+export default function App() {
+  // Split the state into logical groups to make it easier to manage
+  // Tried using reducers initially but it felt like overkill for this
+
   // Core states
   const [file, setFile] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [scale, setScale] = useState(1.0);
   const [documentId, setDocumentId] = useState(null);
 
-  // UI states
+  // UI states  || Keeping UI state separate - makes it easier to handle responsive behavior
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [activeHighlight, setActiveHighlight] = useState(null);
@@ -37,11 +41,12 @@ export default function PdfAnnotator() {
   const [highlights, setHighlights] = useState([]);
   const [selectedColor, setSelectedColor] = useState("#FFD93D");
   const [isHighlighting, setIsHighlighting] = useState(false);
-  
 
   const containerRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // Chose these colors after testing different combinations
+  // Yellow is first since it's most commonly used for highlighting
   const highlightColors = [
     { name: "Yellow", value: "#FFD93D" },
     { name: "Green", value: "#4ECDC4" },
@@ -50,11 +55,12 @@ export default function PdfAnnotator() {
     { name: "Orange", value: "#FF6B6B" },
   ];
 
-  // Responsive handler
+  // Using 768px breakpoint to match Tailwind's md - keeps things consistent
   useEffect(() => {
     const handleResize = () => {
       const smallScreen = window.innerWidth < 768;
       setIsSmallScreen(smallScreen);
+      // Close sidebar on small screens to prevent layout issues
       if (smallScreen) {
         setSidebarOpen(false);
       }
@@ -65,7 +71,7 @@ export default function PdfAnnotator() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Document handling
+  // Generating file here using unique Ids so as to ensure browser can detect when thesame file is opened again
   const generateDocumentId = async (file) => {
     const buffer = await file.arrayBuffer();
     const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
@@ -73,6 +79,7 @@ export default function PdfAnnotator() {
     return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   };
 
+  // function of Uploading file into front-end which is controlled to ensure only pdf files are uploaded
   const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile || selectedFile.type !== "application/pdf") {
@@ -91,7 +98,7 @@ export default function PdfAnnotator() {
     }
   };
 
-  // Annotation management
+  // Annotation management of storing highlights into local storage
   const loadStoredAnnotations = (docId) => {
     try {
       const stored = localStorage.getItem(`pdf-annotations-${docId}`);
@@ -124,6 +131,8 @@ export default function PdfAnnotator() {
     saveAnnotations();
   }, [highlights]);
 
+  // This was tricky to get right - had to handle scrolling offset
+  // and container positioning to get accurate highlight placement
   const handleTextSelection = () => {
     if (!isHighlighting) return;
 
@@ -160,6 +169,7 @@ export default function PdfAnnotator() {
       setActiveHighlight(newHighlight);
       selection.removeAllRanges();
 
+      // Added a little animation to make it feel more polished
       gsap.from(`[data-highlight="${newHighlight.id}"]`, {
         opacity: 0,
         scale: 0.95,
@@ -169,12 +179,14 @@ export default function PdfAnnotator() {
     }
   };
 
+  // Function to instantaneously update the comment as its been typed without to click any other button
+  // I did it this way to ensure assessibility and ease of alteration which is very necessary
   const updateHighlightComment = (id, comment) => {
     setHighlights((prev) =>
       prev.map((h) => (h.id === id ? { ...h, comment } : h))
     );
   };
-
+  // Thi is self explanatory i guess, for deleting highlights
   const deleteHighlight = (id) => {
     gsap.to(`[data-highlight="${id}"]`, {
       opacity: 0,
@@ -195,7 +207,7 @@ export default function PdfAnnotator() {
       {/* Navigation Bar */}
       <nav className="p-4 bg-white shadow-md">
         <div className="container flex items-center justify-between mx-auto">
-          <h1 className="text-xl font-bold">PDF Annotator</h1>
+          <h1 className="text-xl font-bold">PDF Annotator Task</h1>
           <button
             onClick={() => fileInputRef.current?.click()}
             className="flex items-center gap-2 px-4 py-2 text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600"
@@ -301,24 +313,6 @@ export default function PdfAnnotator() {
                           renderTextLayer={true}
                           renderAnnotationLayer={true}
                         />
-                        {/* Highlight Overlays */}
-                        {/* Highlight Overlays */}
-                        {highlights
-                          .filter((h) => h.pageNumber === index + 1)
-                          .map((highlight) => (
-                            <div
-                              key={highlight.id}
-                              data-highlight={highlight.id}
-                              className="absolute transition-opacity duration-200 cursor-pointer hover:opacity-80"
-                              style={{
-                                top: highlight.position.top,
-                                left: highlight.position.left,
-                                width: highlight.position.width,
-                                height: highlight.position.height,
-                              }}
-                              onClick={() => setActiveHighlight(highlight)}
-                            />
-                          ))}
                       </div>
                     ))}
                   </Document>
@@ -341,7 +335,7 @@ export default function PdfAnnotator() {
             )}
           </div>
 
-          {/* Sidebar Toggle for Mobile */}
+          {/* Sidebar Toggle for Mobile View */}
           {file && isSmallScreen && (
             <button
               onClick={() => setSidebarOpen(!isSidebarOpen)}
@@ -355,7 +349,6 @@ export default function PdfAnnotator() {
             </button>
           )}
 
-          {/* Annotations Sidebar */}
           {file && (
             <div
               className={`
@@ -370,9 +363,10 @@ export default function PdfAnnotator() {
               `}
             >
               <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold">
-                    Highlights & Comments
+                <div className="items-center justify-between mb-4 ">
+                  <MessageSquareText className="w-6 h-6 text-gray-600" />
+                  <h2 className="block pt-4 text-lg font-semibold">
+                    Annotations
                   </h2>
                   {isSmallScreen && (
                     <button
@@ -393,19 +387,37 @@ export default function PdfAnnotator() {
                     highlights.map((highlight) => (
                       <div
                         key={highlight.id}
-                        className={`p-4 rounded-lg  border-2 transition-all duration-200 ${
+                        className={`p-4 rounded-lg border-2 transition-all duration-200 ${
                           activeHighlight?.id === highlight.id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-transparent bg-gray-100"
+                            ? "border-opacity-100"
+                            : "border-transparent"
                         }`}
+                        style={{
+                          backgroundColor:
+                            activeHighlight?.id === highlight.id
+                              ? `${highlight.color}15`
+                              : "rgb(243 244 246)",
+                          borderColor:
+                            activeHighlight?.id === highlight.id
+                              ? highlight.color
+                              : "transparent",
+                        }}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div
                             className="flex-shrink-0 w-4 h-4 mt-1 rounded-full"
-                            // style={{ backgroundColor: highlight.color }}
+                            style={{ backgroundColor: highlight.color }}
                           />
                           <div className="flex-1">
-                            <p className="mb-2 text-sm ">"{highlight.text}"</p>
+                            <p
+                              className="mb-2 text-sm"
+                              style={{
+                                borderLeft: `3px solid ${highlight.color}`,
+                                paddingLeft: "0.75rem",
+                              }}
+                            >
+                              "{highlight.text}"
+                            </p>
                             <textarea
                               value={highlight.comment}
                               onChange={(e) =>
@@ -414,13 +426,18 @@ export default function PdfAnnotator() {
                                   e.target.value
                                 )
                               }
-                              className="w-full h-20 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full h-20 p-2 border rounded-lg focus:outline-none focus:ring-2"
+                              style={{
+                                borderColor: `${highlight.color}40`,
+                                "--tw-ring-color": highlight.color,
+                              }}
                               placeholder="Add a comment..."
                             />
                           </div>
                           <button
                             onClick={() => deleteHighlight(highlight.id)}
-                            className="p-2 text-white bg-red-500 rounded-full hover:bg-red-600"
+                            className="p-2 text-white transition-opacity rounded-full hover:opacity-90"
+                            style={{ backgroundColor: highlight.color }}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -437,11 +454,3 @@ export default function PdfAnnotator() {
     </div>
   );
 }
-
-
-
-
-
-
-
-                              
